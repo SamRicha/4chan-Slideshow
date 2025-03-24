@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "4chan Slideshow Viewer",
+    "version": "1.0",
+    "description": "Adds a slideshow button to view all images and videos in a 4chan thread.",
+    "permissions": ["scripting", "activeTab"],
+    "content_scripts": [
+      {
+        "matches": ["https://boards.4chan.org/*"],
+        "js": ["content.js"]
+      }
+    ],
+    "icons": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  }
