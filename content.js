@@ -16,8 +16,8 @@
     let brackets2 = document.createElement('span');
     brackets1.innerText = ' ['; // Set the left bracket
     brackets2.innerText = ']'; // Set the right bracket
-    brackets1.style.color = 'black'; // Keep the brackets black
-    brackets2.style.color = 'black'; // Keep the brackets black
+    brackets1.style.color = '#800000'; // Keep the brackets black
+    brackets2.style.color = '#800000'; // Keep the brackets black
 
     // Append the brackets and text to the anchor
     button.appendChild(brackets1);
