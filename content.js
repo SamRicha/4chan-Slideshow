@@ -89,22 +89,104 @@
         media.style.borderRadius = "8px";
         overlay.appendChild(media);
 
+        let isMuted = false; // Track mute state
+        let isPaused = false; // Track the play/pause state of the video
+        let currentMedia = null; // Store the current media element (video or image)
+
         function updateMedia() {
             let url = mediaFiles[index];
+            
+            // Clear previous content
+            overlay.innerHTML = "";
+        
+            // Add the counter
+            let counter = document.createElement("div");
+            counter.innerText = `${index + 1} / ${mediaFiles.length}`;
+            counter.style.position = "absolute";
+            counter.style.bottom = "10px";
+            counter.style.left = "10px";
+            counter.style.color = "white";
+            counter.style.fontSize = "16px";
+            counter.style.background = "rgba(0, 0, 0, 0.5)";
+            counter.style.padding = "5px 10px";
+            counter.style.borderRadius = "8px";
+            overlay.appendChild(counter);
+        
+            let media;
             if (url.endsWith(".webm") || url.endsWith(".mp4")) {
-                let video = document.createElement("video");
-                video.src = url;
-                video.controls = true;
-                video.autoplay = true;
-                video.style.maxWidth = "90%";
-                video.style.maxHeight = "90%";
-                overlay.innerHTML = ""; 
-                overlay.appendChild(video);
-            } else {
+                media = document.createElement("video");
                 media.src = url;
-                overlay.innerHTML = ""; 
-                overlay.appendChild(media);
+                media.controls = true;
+                media.autoplay = true;
+                media.loop = true;
+                media.muted = isMuted;
+            } else {
+                media = document.createElement("img");
+                media.src = url;
             }
+            media.style.maxWidth = "90%";
+            media.style.maxHeight = "90%";
+            overlay.appendChild(media);
+                    // Store the current media reference
+                    currentMedia = media;
+            // Keydown events for mute, navigation, and download
+            document.onkeydown = function(event) {
+                if (event.key === "m") {
+                    isMuted = !isMuted;
+                    if (currentMedia && currentMedia.tagName === "VIDEO") {
+                        currentMedia.muted = isMuted;
+                    }
+                    console.log(isMuted ? "Muted for all videos" : "Unmuted for all videos");
+
+                } else if (event.key === " ") { // Space key for pause/play
+                    event.preventDefault(); // Prevent scrolling when the spacebar is pressed
+
+                    if (currentMedia && currentMedia.tagName === "VIDEO") {
+                        if (currentMedia.paused) {
+                            currentMedia.play();
+                        } else {
+                            currentMedia.pause();
+                        }
+                        console.log(currentMedia.paused ? "Video Paused" : "Video Playing");
+                    }            } else if (event.key === " ") { // Space key for pause/play
+                        if (currentMedia && currentMedia.tagName === "VIDEO") {
+                            if (currentMedia.paused) {
+                                currentMedia.play();
+                            } else {
+                                currentMedia.pause();
+                            }
+                            console.log(currentMedia.paused ? "Video Paused" : "Video Playing");
+                        }
+                    
+                } else if (event.key === "d") { // Download media
+                    downloadMedia(url);
+                }
+            };
+        }
+        
+        function downloadMedia(url) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'blob';  // This ensures the response is a file (image/video)
+        
+            xhr.onload = function() {
+                const blob = xhr.response;
+                const a = document.createElement('a');
+                const urlObject = URL.createObjectURL(blob); // Create an object URL for the file
+        
+                a.href = urlObject;
+                a.download = url.split('/').pop();  // Extract the filename from the URL
+                a.click();  // Trigger the download
+        
+                // Cleanup: revoke the object URL after the download
+                URL.revokeObjectURL(urlObject);
+            };
+        
+            xhr.onerror = function() {
+                console.error('Failed to download the file');
+            };
+        
+            xhr.send();
         }
 
         updateMedia();
